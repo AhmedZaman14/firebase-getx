@@ -1,4 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import 'login_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -7,10 +11,10 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
+    String email = FirebaseAuth.instance.currentUser?.email.toString() ?? '';
 
     return Scaffold(
       body: Column(
-        // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: w,
@@ -24,7 +28,7 @@ class HomePage extends StatelessWidget {
                 SizedBox(
                   height: h * 0.15,
                 ),
-                CircleAvatar(
+                const CircleAvatar(
                   maxRadius: 60,
                   backgroundColor: Colors.white70,
                   backgroundImage: AssetImage(
@@ -39,11 +43,11 @@ class HomePage extends StatelessWidget {
           ),
           Container(
             width: w,
-            margin: EdgeInsets.only(left: 20, right: 20),
+            margin: const EdgeInsets.only(left: 20, right: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Welcome, now log out',
                   style: TextStyle(
                     fontSize: 30,
@@ -51,7 +55,7 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'example@etc.com',
+                  email,
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey[700],
@@ -61,24 +65,37 @@ class HomePage extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
-          Container(
-            width: w * 0.5,
-            height: h * 0.08,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              image: const DecorationImage(
-                  image: AssetImage('img/loginbtn.png'), fit: BoxFit.cover),
-            ),
-            child: const Center(
-              child: Text(
-                'Sign out',
-                style: TextStyle(
-                  fontSize: 30,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
+          GestureDetector(
+            onTap: () {
+              FirebaseAuth.instance.signOut().then((value) {
+                print(FirebaseAuth.instance.currentUser?.email.toString() ??
+                    'nothing');
+              });
+              Get.to(() => const LoginPage());
+              Get.snackbar('Signed out', 'You have been signed out',
+                  snackPosition: SnackPosition.TOP,
+                  backgroundColor: Colors.deepPurple[300],
+                  colorText: Colors.white);
+            },
+            child: Container(
+              width: w * 0.5,
+              height: h * 0.08,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                image: const DecorationImage(
+                    image: AssetImage('img/loginbtn.png'), fit: BoxFit.cover),
+              ),
+              child: const Center(
+                child: Text(
+                  'Sign out',
+                  style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
