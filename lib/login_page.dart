@@ -203,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                     .then((value) => Get.to(() => const HomePage()))
                     .onError((error, stackTrace) {
                   Get.snackbar('Error', error.toString(),
-                      snackPosition: SnackPosition.BOTTOM,
+                      snackPosition: SnackPosition.TOP,
                       backgroundColor: Color.fromARGB(255, 206, 52, 52),
                       colorText: Colors.white);
                   return null;
@@ -214,6 +214,12 @@ class _LoginPageState extends State<LoginPage> {
                 height: h * 0.08,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.grey.withOpacity(0.9),
+                        blurRadius: 20,
+                        offset: const Offset(5, 10)),
+                  ],
                   image: const DecorationImage(
                       image: AssetImage('img/loginbtn.png'), fit: BoxFit.cover),
                 ),

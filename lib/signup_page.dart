@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_getx/auth.dart';
 import 'package:firebase_getx/home_page.dart';
 import 'package:firebase_getx/login_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -13,14 +18,17 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
+  File? selectedImage;
+
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
 
-    List images = ['img/f.png', 'img/t.png', 'img/g.png'];
+    List images = ['img/f.png', 'img/git.jpg', 'img/g.png'];
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -39,11 +47,44 @@ class _SignupPageState extends State<SignupPage> {
                   SizedBox(
                     height: h * 0.15,
                   ),
-                  const CircleAvatar(
-                    maxRadius: 60,
-                    backgroundColor: Colors.white70,
-                    backgroundImage: AssetImage(
-                      'img/profile1.png',
+                  Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: GestureDetector(
+                      onTap: () async {
+                        final ImagePicker picker = ImagePicker();
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.gallery);
+
+                        if (image != null) {
+                          setState(() {
+                            selectedImage = File(image.path);
+                          });
+                        }
+                      },
+                      child: CircleAvatar(
+                        maxRadius: 60,
+                        backgroundColor: Colors.transparent,
+                        child: selectedImage != null
+                            ? ClipOval(
+                                child: Image.file(
+                                  selectedImage!,
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : ClipOval(
+                                child: Image.asset(
+                                  'img/placeholder.jpg',
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                      ),
                     ),
                   ),
                 ],
@@ -158,30 +199,85 @@ class _SignupPageState extends State<SignupPage> {
                   ]),
             ),
             GestureDetector(
-              onTap: () {
-                FirebaseAuth.instance
-                    .createUserWithEmailAndPassword(
-                  email: _emailController.text,
-                  password: _passwordController.text,
-                )
-                    .then((value) {
-                  Get.snackbar('Signed In', "You're signed in");
-                  Get.to(() => const HomePage());
-                }).onError((error, stackTrace) {
+              onTap: () async {
+                String errorMsg = '';
+                try {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      });
+
+                  await FirebaseAuth.instance
+                      .createUserWithEmailAndPassword(
+                    email: _emailController.text,
+                    password: _passwordController.text,
+                  )
+                      .then((value) async {
+                    //for image upload
+                    //  Reference ref = FirebaseStorage.instance.ref().child('userProfile').child('${DateTime.now().millisecondsSinceEpoch}');
+                    User? user = FirebaseAuth.instance.currentUser;
+                    String uid = user!.uid;
+
+                    Reference ref = FirebaseStorage.instance
+                        .ref()
+                        .child('userProfile.jpg$uid');
+
+                    await ref.putFile(File(selectedImage!.path));
+
+                    ref.getDownloadURL().then((value) {
+                      // ignore: avoid_print
+                      print(value);
+                    });
+                    // ignore: use_build_context_synchronously
+                    Navigator.pop(context);
+                    Get.snackbar('Signed In', "You're signed in");
+
+                    Get.to(() => const HomePage());
+                  });
+                  // .onError((error, stackTrace) {
+                  //   Get.snackbar(
+                  //     'Error',
+                  //     error.toString(),
+                  //     snackPosition: SnackPosition.BOTTOM,
+                  //     backgroundColor: Colors.red,
+                  //     colorText: Colors.white,
+                  //     snackStyle: SnackStyle.FLOATING,
+                  //   );
+                  // });
+                } on FirebaseAuthException catch (e) {
+                  if (e.code == 'weak-password') {
+                    errorMsg = 'The password provided is too weak.';
+                  } else if (e.code == 'email-already-in-use') {
+                    errorMsg = 'The account already exists for that email.';
+                  } else {
+                    errorMsg = e.code;
+                  }
+
                   Get.snackbar(
                     'Error',
-                    error.toString(),
+                    errorMsg,
                     snackPosition: SnackPosition.BOTTOM,
                     backgroundColor: Colors.red,
                     colorText: Colors.white,
                     snackStyle: SnackStyle.FLOATING,
                   );
-                });
+
+                  Navigator.pop(context);
+                }
               },
               child: Container(
                 width: w * 0.5,
                 height: h * 0.08,
                 decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.grey.withOpacity(0.9),
+                        blurRadius: 20,
+                        offset: const Offset(5, 10)),
+                  ],
                   borderRadius: BorderRadius.circular(30),
                   image: const DecorationImage(
                       image: AssetImage('img/loginbtn.png'), fit: BoxFit.cover),
@@ -217,12 +313,25 @@ class _SignupPageState extends State<SignupPage> {
                 (index) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.grey[500],
+                    child: GestureDetector(
+                      onTap: () async {
+                        if (index == 2) {
+                          try {
+                            await signInWithGoogle().then((value) {
+                              Get.to(const HomePage());
+                            });
+                          } catch (e) {
+                            Get.snackbar('Error', e.toString());
+                          }
+                        }
+                      },
                       child: CircleAvatar(
-                        maxRadius: 25,
-                        backgroundImage: AssetImage(images[index]),
+                        radius: 30,
+                        backgroundColor: Colors.grey[500],
+                        child: CircleAvatar(
+                          maxRadius: 25,
+                          backgroundImage: AssetImage(images[index]),
+                        ),
                       ),
                     ),
                   );

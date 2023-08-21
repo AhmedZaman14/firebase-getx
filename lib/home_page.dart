@@ -1,24 +1,31 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'login_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String? url;
 
   @override
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
     String email = FirebaseAuth.instance.currentUser?.email.toString() ?? '';
-
     return Scaffold(
       body: Column(
         children: [
           Container(
             width: w,
-            height: h * 0.3,
+            height: h * 0.5,
             decoration: const BoxDecoration(
               image: DecorationImage(
                   image: AssetImage('img/signup.png'), fit: BoxFit.cover),
@@ -28,11 +35,31 @@ class HomePage extends StatelessWidget {
                 SizedBox(
                   height: h * 0.15,
                 ),
-                const CircleAvatar(
-                  maxRadius: 60,
-                  backgroundColor: Colors.white70,
-                  backgroundImage: AssetImage(
-                    'img/profile1.png',
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: CircleAvatar(
+                    maxRadius: 50,
+                    backgroundColor: Colors.transparent,
+                    child: url != null
+                        ? ClipOval(
+                            child: Image.network(
+                              url!,
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : ClipOval(
+                            child: Image.asset(
+                              'img/placeholder.jpg',
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                   ),
                 ),
               ],
@@ -62,6 +89,72 @@ class HomePage extends StatelessWidget {
                     fontWeight: FontWeight.w400,
                   ),
                 ),
+                GestureDetector(
+                  onTap: () async {
+                    String errorMsg = '';
+                    try {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          });
+
+                      //for image upload
+                      //  Reference ref = FirebaseStorage.instance.ref().child('userProfile').child('${DateTime.now().millisecondsSinceEpoch}');
+                      User? user = FirebaseAuth.instance.currentUser;
+                      String uid = user!.uid;
+                      // print('user yuid---- ' + uid.toString());
+                      Reference ref = await FirebaseStorage.instance
+                          .ref()
+                          .child('userProfile.jpg$uid');
+                      print('userProfile.jpg$uid');
+                      // print(uid.toString() + ' ---------------uid111');
+                      // await ref.putFile(File(selectedImage!.path));
+
+                      url = ref.getDownloadURL().then((value) {
+                        setState(() {
+                          url = value;
+                        });
+                        print('url is ' + url.toString());
+                        // ignore: avoid_print
+                        print(uid.toString() + ' ---------------uid');
+                        Navigator.pop(context);
+                      }) as String?;
+                      // ignore: use_build_context_synchronously
+                      Navigator.pop(context);
+                      Get.snackbar('Signed In', "You're signed in");
+
+                      Get.to(() => const HomePage());
+
+                      // .onError((error, stackTrace) {
+                      //   Get.snackbar(
+                      //     'Error',
+                      //     error.toString(),
+                      //     snackPosition: SnackPosition.BOTTOM,
+                      //     backgroundColor: Colors.red,
+                      //     colorText: Colors.white,
+                      //     snackStyle: SnackStyle.FLOATING,
+                      //   );
+                      // });
+                    } on FirebaseAuthException catch (e) {
+                      errorMsg = e.code;
+
+                      Get.snackbar(
+                        'Error',
+                        errorMsg,
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        snackStyle: SnackStyle.FLOATING,
+                      );
+
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Text('click here to see image  ' + url.toString()),
+                ),
               ],
             ),
           ),
@@ -71,8 +164,13 @@ class HomePage extends StatelessWidget {
           GestureDetector(
             onTap: () {
               FirebaseAuth.instance.signOut().then((value) {
-                print(FirebaseAuth.instance.currentUser?.email.toString() ??
-                    'nothing');
+                FirebaseAuth.instance.authStateChanges().listen((User? user) {
+                  if (user == null) {
+                    // print('User signed out');
+                  } else {
+                    //  print("not signed out");
+                  }
+                });
               });
               Get.to(() => const LoginPage());
               Get.snackbar('Signed out', 'You have been signed out',

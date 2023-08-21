@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_getx/signup_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -13,7 +14,16 @@ class ResetPassword extends StatelessWidget {
   Widget build(BuildContext context) {
     TextEditingController _emailController = TextEditingController();
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
+        title: Text(
+          'Reset Password',
+          style: TextStyle(
+            fontSize: 30,
+            color: Colors.black54,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: Colors.blueGrey[200],
         elevation: 0,
         leading: IconButton(
@@ -33,15 +43,6 @@ class ResetPassword extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Reset Password',
-                style: TextStyle(
-                  fontSize: 40,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Times New Roman',
-                ),
-              ),
               SizedBox(
                 height: 20,
               ),
@@ -49,9 +50,19 @@ class ResetPassword extends StatelessWidget {
               SizedBox(
                 height: 20,
               ),
-              SizedBox(
+              Container(
                 width: MediaQuery.of(context).size.width,
                 height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
                 child: ElevatedButton(
                   onPressed: () {
                     FirebaseAuth.instance
@@ -67,12 +78,24 @@ class ResetPassword extends StatelessWidget {
                           colorText: Colors.white);
                     });
                   },
-                  child: Text(
-                    'Reset Password',
-                    style: TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.normal,
-                        fontSize: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.lock_reset,
+                        color: Colors.grey[600],
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        'Reset Password',
+                        style: TextStyle(
+                            color: Colors.black87,
+                            fontWeight: FontWeight.normal,
+                            fontSize: 20),
+                      ),
+                    ],
                   ),
                 ),
               )
@@ -80,34 +103,80 @@ class ResetPassword extends StatelessWidget {
           ),
         ),
       )),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.shifting,
+        selectedFontSize: 20,
+        selectedIconTheme: IconThemeData(color: Colors.deepPurple),
+        selectedItemColor: Colors.deepPurple,
+        selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+        unselectedFontSize: 15,
+        unselectedItemColor: Colors.grey[600],
+        showUnselectedLabels: true,
+        unselectedLabelStyle:
+            TextStyle(fontWeight: FontWeight.normal, color: Colors.black),
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.login,
+            ),
+            label: 'Login',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.app_registration),
+            label: 'Sign Up',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.restore),
+            label: 'Reset',
+          ),
+        ],
+        currentIndex: 2,
+        onTap: (value) {
+          if (value == 0) {
+            Get.to(() => LoginPage());
+          } else if (value == 1) {
+            Get.to(() => const SignupPage());
+          }
+        },
+      ),
     );
   }
 
   Widget _textField(
       bool isPassword, String hint, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      obscureText: isPassword,
-      keyboardType: TextInputType.emailAddress,
-      decoration: InputDecoration(
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: Colors.white, width: 1),
+    return Container(
+      decoration:
+          BoxDecoration(borderRadius: BorderRadius.circular(30), boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.5),
+          blurRadius: 10,
+          offset: const Offset(0, 5),
         ),
-        border: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.white, width: 1),
-          borderRadius: BorderRadius.circular(30),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: Colors.white, width: 1),
-        ),
-        filled: true,
-        fillColor: Colors.grey[200],
-        hintText: hint,
-        prefixIcon: Icon(
-          !isPassword ? Icons.email : Icons.lock,
-          color: Colors.grey[600],
+      ]),
+      child: TextField(
+        controller: controller,
+        obscureText: isPassword,
+        keyboardType: TextInputType.emailAddress,
+        decoration: InputDecoration(
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide(color: Colors.transparent, width: 1),
+          ),
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.transparent, width: 1),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide(color: Colors.transparent, width: 1),
+          ),
+          filled: true,
+          fillColor: Colors.grey[200],
+          hintText: hint,
+          prefixIcon: Icon(
+            !isPassword ? Icons.email : Icons.lock,
+            color: Colors.grey[600],
+          ),
         ),
       ),
     );
