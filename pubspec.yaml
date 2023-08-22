@@ -43,6 +43,8 @@ dependencies:
   google_sign_in: ^6.1.4
   image_picker: ^1.0.2
   firebase_storage: 
+  modal_bottom_sheet: ^2.1.2
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -94,3 +96,8 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+dependency_overrides:
+  modal_bottom_sheet:
+    git:
+      url: https://github.com/danReynolds/modal_bottom_sheet.git
+      path: modal_bottom_sheet
