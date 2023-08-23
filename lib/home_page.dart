@@ -2,6 +2,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_getx/floating_sheet.dart';
+import 'package:firebase_getx/talabad_homeview.dart';
 import 'package:firebase_getx/test_screen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -258,6 +259,15 @@ class _HomePageState extends State<HomePage> {
                 Get.to(TestScreen());
               },
               child: Text('Next Screen'),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Get.to(TalabadHomeView());
+              },
+              child: Text('Talabad Home View'),
             ),
             SizedBox(
               height: 50,
