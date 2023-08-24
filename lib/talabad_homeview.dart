@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:card_swiper/card_swiper.dart';
 import 'package:firebase_getx/widgets/category_container.dart';
 import 'package:firebase_getx/widgets/login_container.dart';
 import 'package:flutter/material.dart';
@@ -13,30 +14,101 @@ class TalabadHomeView extends StatefulWidget {
 }
 
 class _TalabadHomeViewState extends State<TalabadHomeView> {
-  List shortCuts = [
-    'Past\nOrders',
-    'Super\nSaver',
-    'Flash Sale',
-    'Must-tries',
-    'Give\nBack',
-    'Past\nOrders',
-    'Super\nSaver',
-  ];
-  List shortCutImgs = [
-    'img/health.png',
-    'img/flower.png',
-    'img/coffee.png',
-    'img/shop.png',
-    'img/grocery.png',
-    'img/shop.png',
-    'img/health.png',
-  ];
+  int currentIndex = 0;
+
+  Widget cardSwiper(
+    List img,
+  ) {
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.all(8),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Swiper(
+              layout: SwiperLayout.CUSTOM,
+              customLayoutOption:
+                  CustomLayoutOption(startIndex: -1, stateCount: 3)
+                    ..addTranslate([
+                      Offset(-400.0, 0.0),
+                      Offset(0.0, 0.0),
+                      Offset(400.0, 0.0)
+                    ]),
+              itemHeight: 200.0,
+              itemWidth: double.infinity,
+              itemBuilder: (context, index) {
+                return Image.asset(
+                  img[index],
+                  fit: BoxFit.cover,
+                );
+              },
+              itemCount: img.length,
+              autoplay: true,
+              duration: 200,
+              autoplayDelay: 3000,
+              autoplayDisableOnInteraction: true,
+              onIndexChanged: (value) {
+                setState(() {
+                  currentIndex = value;
+                });
+              },
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            img.length,
+            (index) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: CircleAvatar(
+                radius: 4,
+                backgroundColor:
+                    index == currentIndex ? Colors.black54 : Colors.grey[400],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    List shortCuts = [
+      'Past\nOrders',
+      'Super\nSaver',
+      'Flash Sale',
+      'Must-tries',
+      'Give\nBack',
+      'Past\nOrders',
+      'Super\nSaver',
+    ];
+    List shortCutImgs = [
+      Icons.padding_sharp,
+      Icons.offline_bolt_sharp,
+      Icons.shopify_sharp,
+      Icons.all_inclusive_sharp,
+      Icons.handshake,
+      Icons.offline_bolt,
+      Icons.diamond,
+    ];
+    List img = ['img/promo1.jpg', 'img/promo2.jpg', 'img/macdonald.png'];
+    List restaurantImgs = [
+      'img/macdonald.png',
+      'img/macdonald.png',
+      'img/macdonald.png',
+      'img/kfc.png',
+      'img/kfc.png'
+    ];
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Colors.deepOrange.withOpacity(0.07),
+          backgroundColor: Colors.orange.withOpacity(0.07),
+          shadowColor: Colors.transparent,
           title:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(
@@ -119,12 +191,12 @@ class _TalabadHomeViewState extends State<TalabadHomeView> {
                   ),
                   subCategoryContainer(
                     'img/flower.png',
-                    'Mart',
+                    'Flowers',
                     null,
                   ),
                   subCategoryContainer(
                     'img/coffee.png',
-                    'Groceries',
+                    'Coffee',
                     null,
                   ),
                   subCategoryContainer(
@@ -134,6 +206,10 @@ class _TalabadHomeViewState extends State<TalabadHomeView> {
                   ),
                 ],
               ),
+              SizedBox(
+                height: 20,
+              ),
+              simpleContainer(),
               Padding(
                 padding: const EdgeInsets.only(left: 10, top: 20, bottom: 20),
                 child: Text(
@@ -141,7 +217,7 @@ class _TalabadHomeViewState extends State<TalabadHomeView> {
                   style: GoogleFonts.lato(
                     textStyle: TextStyle(
                       color: Colors.black,
-                      fontSize: 30,
+                      fontSize: 25,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -153,12 +229,43 @@ class _TalabadHomeViewState extends State<TalabadHomeView> {
                 physics: BouncingScrollPhysics(),
                 child: Wrap(
                     spacing: 10,
-                    children: List.generate(7, (index) {
-                      return subCategoryContainer(
+                    children: List.generate(shortCutImgs.length, (index) {
+                      return subCategoryContainer2(
                         shortCutImgs[index],
                         shortCuts[index],
-                        Colors.deepOrange.withOpacity(0.15),
+                        Colors.deepOrange.withOpacity(0.1),
                       );
+                    })),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              cardSwiper(img),
+              SizedBox(
+                height: 20,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 10, top: 20, bottom: 20),
+                child: Text(
+                  'Popular restaurants nearby',
+                  style: GoogleFonts.lato(
+                    textStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              SingleChildScrollView(
+                padding: EdgeInsets.only(left: 10),
+                scrollDirection: Axis.horizontal,
+                physics: BouncingScrollPhysics(),
+                child: Wrap(
+                    spacing: 10,
+                    children: List.generate(restaurantImgs.length, (index) {
+                      return popularRestaurants(
+                          restaurantImgs[index], 'KFC', Colors.grey[200]);
                     })),
               ),
               SizedBox(

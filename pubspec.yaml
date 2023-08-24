@@ -45,7 +45,8 @@ dependencies:
   firebase_storage: 
   modal_bottom_sheet: ^2.1.2
   google_fonts: ^5.1.0
-  
+  shimmer: ^3.0.0
+  card_swiper: ^3.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
