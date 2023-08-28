@@ -3,6 +3,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 
 import 'floating_sheet.dart';
@@ -131,7 +132,7 @@ class S1 extends StatelessWidget {
 }
 
 class S2 extends StatefulWidget {
-  S2({Key? key}) : super(key: key);
+  const S2({Key? key}) : super(key: key);
 
   @override
   State<S2> createState() => _S2State();
@@ -186,11 +187,110 @@ class _S2State extends State<S2> {
   }
 }
 
-class S3 extends StatelessWidget {
+class S3 extends StatefulWidget {
   const S3({super.key});
 
   @override
+  State<S3> createState() => _S3State();
+}
+
+class _S3State extends State<S3> {
+  // Height of your Container
+
+  static final _containerHeight = 100.0;
+
+  // You don't need to change any of these variables
+  var _fromTop = -_containerHeight;
+  var _controller = ScrollController();
+  var _allowReverse = true, _allowForward = true;
+  var _prevOffset = 0.0;
+  var _prevForwardOffset = -_containerHeight;
+  var _prevReverseOffset = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_listener);
+  }
+
+  // entire logic is inside this listener for ListView
+  void _listener() {
+    double offset = _controller.offset;
+    var direction = _controller.position.userScrollDirection;
+
+    if (direction == ScrollDirection.reverse) {
+      _allowForward = true;
+
+      if (_allowReverse) {
+        _allowReverse = false;
+        _prevOffset = offset;
+        _prevForwardOffset = _fromTop;
+      }
+
+      var difference = offset - _prevOffset;
+      _fromTop = _prevForwardOffset + difference;
+      if (_fromTop > 0) _fromTop = 0;
+    } else if (direction == ScrollDirection.forward) {
+      _allowReverse = true;
+
+      if (_allowForward) {
+        _allowForward = false;
+        _prevReverseOffset = _fromTop;
+      }
+
+      var difference = offset - _prevOffset;
+
+      if (offset > 100.0) {
+        _prevOffset = offset;
+      }
+
+      if (offset < 100.0) {
+        _fromTop = _prevReverseOffset + difference;
+        if (_fromTop < -_containerHeight) _fromTop = -_containerHeight;
+      }
+    }
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      appBar: AppBar(title: Text("ListView")),
+      body: Stack(
+        children: <Widget>[
+          _yourListView(),
+          Positioned(
+            top: _fromTop,
+            left: 0,
+            right: 0,
+            child: _yourContainer(),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _yourListView() {
+    return ListView.builder(
+      itemCount: 100,
+      controller: _controller,
+      itemBuilder: (_, index) => ListTile(title: Text("Item $index")),
+    );
+  }
+
+  Widget _yourContainer() {
+    return Opacity(
+      opacity: 1,
+      child: Container(
+        height: _containerHeight,
+        color: Colors.red,
+        alignment: Alignment.center,
+        child: Text("Your Container",
+            style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.white)),
+      ),
+    );
   }
 }

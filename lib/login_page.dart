@@ -75,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                         controller: emailController,
                         decoration: InputDecoration(
                           hintText: 'example@xyz.com',
-                          prefixIcon: Icon(
+                          prefixIcon: const Icon(
                             Icons.email,
                             color: Colors.deepOrangeAccent,
                           ),
@@ -123,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                         obscureText: isPassVisible,
                         decoration: InputDecoration(
                           hintText: '***********',
-                          prefixIcon: Icon(
+                          prefixIcon: const Icon(
                             Icons.lock,
                             color: Colors.deepOrangeAccent,
                           ),
@@ -134,11 +134,11 @@ class _LoginPageState extends State<LoginPage> {
                               });
                             },
                             icon: isPassVisible
-                                ? Icon(
+                                ? const Icon(
                                     Icons.visibility_off,
                                     color: Colors.deepOrangeAccent,
                                   )
-                                : Icon(
+                                : const Icon(
                                     Icons.visibility,
                                     color: Colors.deepOrangeAccent,
                                   ),
@@ -204,7 +204,7 @@ class _LoginPageState extends State<LoginPage> {
                     .onError((error, stackTrace) {
                   Get.snackbar('Error', error.toString(),
                       snackPosition: SnackPosition.TOP,
-                      backgroundColor: Color.fromARGB(255, 206, 52, 52),
+                      backgroundColor: const Color.fromARGB(255, 206, 52, 52),
                       colorText: Colors.white);
                   return null;
                 });

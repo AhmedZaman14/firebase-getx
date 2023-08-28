@@ -150,10 +150,10 @@ class _HomePageState extends State<HomePage> {
                         User? user = FirebaseAuth.instance.currentUser;
                         String uid = user!.uid;
                         // print('user yuid---- ' + uid.toString());
-                        Reference ref = await FirebaseStorage.instance
+                        Reference ref = FirebaseStorage.instance
                             .ref()
                             .child('userProfile.jpg$uid');
-                        print('userProfile.jpg$uid');
+                        // print('userProfile.jpg$uid');
                         // print(uid.toString() + ' ---------------uid111');
                         // await ref.putFile(File(selectedImage!.path));
 
@@ -161,9 +161,9 @@ class _HomePageState extends State<HomePage> {
                           setState(() {
                             url = value;
                           });
-                          print('url is ' + url.toString());
+                          //  print('url is ' + url.toString());
                           // ignore: avoid_print
-                          print(uid.toString() + ' ---------------uid');
+                          // print(uid.toString() + ' ---------------uid');
                           Navigator.pop(context);
                         }) as String?;
                         // ignore: use_build_context_synchronously
@@ -197,7 +197,7 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pop(context);
                       }
                     },
-                    child: Text('click here to see image  ' + url.toString()),
+                    child: Text('click here to see image  $url'),
                   ),
                 ],
               ),

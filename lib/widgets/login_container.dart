@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 Widget loginContainer() {
   return Stack(children: [
     Container(
-      height: 200,
+      height: 180,
       width: double.infinity,
       padding: EdgeInsets.only(left: 20),
       decoration: BoxDecoration(

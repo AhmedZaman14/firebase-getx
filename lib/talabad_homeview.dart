@@ -1,9 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:card_swiper/card_swiper.dart';
+import 'package:firebase_getx/talabad_screen2.dart';
 import 'package:firebase_getx/widgets/category_container.dart';
 import 'package:firebase_getx/widgets/login_container.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class TalabadHomeView extends StatefulWidget {
@@ -154,12 +156,19 @@ class _TalabadHomeViewState extends State<TalabadHomeView> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  categoryContainer(
-                    'img/burger.png',
-                    'Food',
-                    'Up to 50%',
-                    null,
-                    null,
+                  GestureDetector(
+                    onTap: () {
+                      Get.to(
+                        TalabadScreen2(),
+                      );
+                    },
+                    child: categoryContainer(
+                      'img/burger.png',
+                      'Food',
+                      'Up to 50%',
+                      null,
+                      null,
+                    ),
                   ),
                   categoryContainer(
                     'img/mart.png',

@@ -134,10 +134,15 @@ Widget subCategoryContainer2(
         padding: const EdgeInsets.all(15),
         // width: 150,
         //height: 100,
-        child: Icon(
-          icon,
-          size: 45,
-          color: Colors.deepOrange,
+        child: Shimmer.fromColors(
+          baseColor: Colors.deepOrange,
+          highlightColor: Colors.grey.shade100,
+          direction: ShimmerDirection.rtl,
+          child: Icon(
+            icon,
+            size: 45,
+            color: Colors.deepOrange,
+          ),
         ),
       ),
       const SizedBox(
