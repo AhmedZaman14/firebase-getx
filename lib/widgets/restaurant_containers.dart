@@ -109,7 +109,7 @@ Widget restaurantContainerFull(
           children: [
             Container(
               width: double.infinity,
-              height: 200,
+              height: 150,
               decoration: BoxDecoration(
                 color: Colors.transparent,
                 borderRadius: BorderRadius.circular(10),
@@ -250,8 +250,8 @@ Widget restaurantContainerFull(
             child: Image.asset(
               profileImg,
               fit: BoxFit.cover,
-              height: 100,
-              width: 100,
+              height: 85,
+              width: 95,
             ),
           ),
         ),

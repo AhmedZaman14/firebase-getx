@@ -110,7 +110,6 @@ class _TalabadHomeViewState extends State<TalabadHomeView> {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           backgroundColor: Colors.orange.withOpacity(0.07),
-          shadowColor: Colors.transparent,
           title:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(

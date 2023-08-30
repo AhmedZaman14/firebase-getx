@@ -1,9 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_getx/talabad_screen3.dart';
+import 'package:firebase_getx/widgets/expanded_restaurant.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 
 import 'floating_sheet.dart';
@@ -22,16 +23,16 @@ class _TestScreenState extends State<TestScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        leading: BackButton(onPressed: () {
-          Navigator.pop(context);
-        }),
-      ),
+      // appBar: AppBar(
+      //   leading: BackButton(onPressed: () {
+      //     Navigator.pop(context);
+      //   }),
+      // ),
       body: currentIndex == 0
           ? S1()
           : currentIndex == 1
               ? S2()
-              : S3(),
+              : SliverTabExample(),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.shifting,
         elevation: 20,
@@ -187,109 +188,132 @@ class _S2State extends State<S2> {
   }
 }
 
-class S3 extends StatefulWidget {
-  const S3({super.key});
+class SliverTabExample extends StatefulWidget {
+  const SliverTabExample({Key? key}) : super(key: key);
 
   @override
-  State<S3> createState() => _S3State();
+  State<SliverTabExample> createState() => _SliverTabExampleState();
 }
 
-class _S3State extends State<S3> {
-  // Height of your Container
+class _SliverTabExampleState extends State<SliverTabExample>
+    with SingleTickerProviderStateMixin {
+  final _tabs = List.generate(10, (index) => 'Tab#${index + 1}');
 
-  static final _containerHeight = 100.0;
-
-  // You don't need to change any of these variables
-  var _fromTop = -_containerHeight;
-  var _controller = ScrollController();
-  var _allowReverse = true, _allowForward = true;
-  var _prevOffset = 0.0;
-  var _prevForwardOffset = -_containerHeight;
-  var _prevReverseOffset = 0.0;
-
+  late final TabController _tabCont;
   @override
   void initState() {
+    _tabCont = TabController(length: 10, vsync: this);
     super.initState();
-    _controller.addListener(_listener);
-  }
-
-  // entire logic is inside this listener for ListView
-  void _listener() {
-    double offset = _controller.offset;
-    var direction = _controller.position.userScrollDirection;
-
-    if (direction == ScrollDirection.reverse) {
-      _allowForward = true;
-
-      if (_allowReverse) {
-        _allowReverse = false;
-        _prevOffset = offset;
-        _prevForwardOffset = _fromTop;
-      }
-
-      var difference = offset - _prevOffset;
-      _fromTop = _prevForwardOffset + difference;
-      if (_fromTop > 0) _fromTop = 0;
-    } else if (direction == ScrollDirection.forward) {
-      _allowReverse = true;
-
-      if (_allowForward) {
-        _allowForward = false;
-        _prevReverseOffset = _fromTop;
-      }
-
-      var difference = offset - _prevOffset;
-
-      if (offset > 100.0) {
-        _prevOffset = offset;
-      }
-
-      if (offset < 100.0) {
-        _fromTop = _prevReverseOffset + difference;
-        if (_fromTop < -_containerHeight) _fromTop = -_containerHeight;
-      }
-    }
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("ListView")),
-      body: Stack(
-        children: <Widget>[
-          _yourListView(),
-          Positioned(
-            top: _fromTop,
-            left: 0,
-            right: 0,
-            child: _yourContainer(),
-          )
-        ],
-      ),
-    );
-  }
+      body: NestedScrollView(
+        headerSliverBuilder: (_, __) {
+          return [
+            SliverAppBar(
+              backgroundColor: Colors.white,
+              scrolledUnderElevation: 0.0,
+              elevation: 0,
+              automaticallyImplyLeading: false,
+              leading: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: Colors.black87,
+                    size: 25,
+                  ),
+                ),
+              ),
+              flexibleSpace: FlexibleSpaceBar(
+                  collapseMode: CollapseMode.pin,
+                  background: Stack(
+                    children: [
+                      Image.asset(
+                        "img/cover.jpg",
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * 0.2,
+                        fit: BoxFit.cover,
+                      ),
+                      Positioned(
+                        top: MediaQuery.of(context).size.height * 0.14,
+                        left: 10,
+                        right: 10,
+                        child: restaurantInfoContainer(),
+                      ),
+                    ],
+                  )),
+              actions: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    padding: EdgeInsets.all(0),
+                    icon: Icon(
+                      Icons.ios_share_rounded,
+                      color: Colors.black87,
+                      size: 25,
+                    ),
+                    onPressed: () {},
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    padding: EdgeInsets.all(0),
+                    icon: Icon(
+                      Icons.search,
+                      weight: 0.001,
+                      color: Colors.black87,
+                      size: 25,
+                    ),
+                    onPressed: () {},
+                  ),
+                ),
+              ],
 
-  Widget _yourListView() {
-    return ListView.builder(
-      itemCount: 100,
-      controller: _controller,
-      itemBuilder: (_, index) => ListTile(title: Text("Item $index")),
-    );
-  }
+              expandedHeight: MediaQuery.of(context).size.height * 0.45,
+              collapsedHeight: 70,
 
-  Widget _yourContainer() {
-    return Opacity(
-      opacity: 1,
-      child: Container(
-        height: _containerHeight,
-        color: Colors.red,
-        alignment: Alignment.center,
-        child: Text("Your Container",
-            style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.white)),
+              pinned: true,
+              floating: false,
+              // title: Text('TabBar Example'),
+              centerTitle: true,
+              bottom: TabBar(
+                controller: _tabCont,
+                isScrollable: true,
+                tabs: [
+                  ..._tabs.map(
+                    (label) => Tab(
+                      child: Text(label),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ];
+        },
+        body: TabBarView(
+          controller: _tabCont,
+          children: [
+            ..._tabs.map(
+              (label) => SamplePage(
+                label: label,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
